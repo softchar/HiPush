@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3BCC4BA0-ED71-4BB7-A84D-38A1CB3A8B7B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Hi.Infrastructure</RootNamespace>
+    <AssemblyName>Hi.Infrastructure</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base\Ensure.cs" />
+    <Compile Include="Base\HiLinkList.cs" />
+    <Compile Include="Base\HiLinkNode.cs" />
+    <Compile Include="Base\ILinkList.cs" />
+    <Compile Include="Base\ILinkNode.cs" />
+    <Compile Include="Base\InPutParamException.cs" />
+    <Compile Include="Configuration\ApplicationSettingsFactory.cs" />
+    <Compile Include="Configuration\IApplicationSettings.cs" />
+    <Compile Include="Configuration\WebConfigApplicationSettings.cs" />
+    <Compile Include="Domain\BusinessRule.cs" />
+    <Compile Include="Domain\BusinessRuleException.cs" />
+    <Compile Include="Domain\Entity.cs" />
+    <Compile Include="Domain\IAggregateRoot.cs" />
+    <Compile Include="Domain\IReadOnlyRepository.cs" />
+    <Compile Include="Domain\IRepository.cs" />
+    <Compile Include="Domain\RemoveState.cs" />
+    <Compile Include="Domain\ReturnValue.cs" />
+    <Compile Include="Dto\PageResult.cs" />
+    <Compile Include="Dto\Results.cs" />
+    <Compile Include="EventHandle\BusProvider.cs" />
+    <Compile Include="EventHandle\EventBus.cs" />
+    <Compile Include="EventHandle\IEvent.cs" />
+    <Compile Include="EventHandle\ISubscriber.cs" />
+    <Compile Include="Extension\IntEx.cs" />
+    <Compile Include="Extension\MathEx.cs" />
+    <Compile Include="Ioc\InterFaceFactory.cs" />
+    <Compile Include="Ioc\IContainer.cs" />
+    <Compile Include="Ioc\IOCContainerFactory.cs" />
+    <Compile Include="Ioc\NInjectContainer.cs" />
+    <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Logging\Log4NetAdapter.cs" />
+    <Compile Include="Logging\LoggingFactory.cs" />
+    <Compile Include="Messaging\Command\CommandBus.cs" />
+    <Compile Include="Messaging\Command\CommandResult.cs" />
+    <Compile Include="Messaging\Command\ICommand.cs" />
+    <Compile Include="Messaging\Command\ICommandHandler.cs" />
+    <Compile Include="Messaging\Command\ICommandHandleRegisterEntry.cs" />
+    <Compile Include="Messaging\Event\EventResult.cs" />
+    <Compile Include="Messaging\Event\IDomainEventHandleRegisterEntry.cs" />
+    <Compile Include="Messaging\HandleRegisterEntryBase.cs" />
+    <Compile Include="Messaging\IHandleRegisterEntry.cs" />
+    <Compile Include="Messaging\Event\DomainEventBus.cs" />
+    <Compile Include="Messaging\Event\IDomainEvent.cs" />
+    <Compile Include="Messaging\Event\IDomainEventHandler.cs" />
+    <Compile Include="Messaging\IHandler.cs" />
+    <Compile Include="Messaging\IMessage.cs" />
+    <Compile Include="Messaging\IMessageSender.cs" />
+    <Compile Include="Messaging\ExecuteResult.cs" />
+    <Compile Include="NetWork\SocketUtils.cs" />
+    <Compile Include="Querying\CriteriaOperator.cs" />
+    <Compile Include="Querying\Criterion.cs" />
+    <Compile Include="Querying\OrderByClause.cs" />
+    <Compile Include="Querying\PropertyNameHelper.cs" />
+    <Compile Include="Querying\Query.cs" />
+    <Compile Include="Querying\QueryOperator.cs" />
+    <Compile Include="Reflection\HiTyper.cs" />
+    <Compile Include="UnitOfWork\IUnitOfWork.cs" />
+    <Compile Include="UnitOfWork\IUnitOfWorkRepository.cs" />
+    <Compile Include="Domain\ValueObject.cs" />
+    <Compile Include="Domain\ValueObjectIsInvalidException.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Ioc\读我.txt" />
+    <Content Include="Reflection\读我.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,36 @@
+﻿
+@section head_title{
+    <title>添加应用程序</title> 
+    <style type="text/css">
+        .hi-input {
+            width: 80%;
+        }
+    </style>
+}
+<section class='content'>
+    <form id="productForm" name="productForm" class="form-horizontal" action="/admin/product/submit" method="post" enctype="application/x-www-form-urlencoded">
+        <div class="box box-default" style="max-width:600px">
+            <div class="box-header with-border">
+                <h3 class="box-title">添加新应用程序</h3>
+            </div>
+            <div class="box-body">
+                <div style="margin-top:20px;">
+                    <div class="form-group">
+                        <label for="sel_parent_category" class="col-sm-3 control-label" for="product_title">应用程序名称:</label>
+                        <div class="col-sm-9">
+                            <input type="text" placeholder="请输入..." id="appName" name="AppName" class="form-control form-text hi-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <div class="form-group">
+                    <label class="col-sm-3"></label>
+                    <div class="col-sm-9">
+                        <button id="appNameSubmit" type="submit" class="btn btn-primary pull-left" onclick="return FormSubmit()">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

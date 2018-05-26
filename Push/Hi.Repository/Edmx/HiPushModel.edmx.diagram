@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <edmx:Designer>
+    <edmx:Diagrams>
+      <edmx:Diagram DiagramId="b965d7d8201c4591b75a0853b3abc854" Name="Diagram1">
+        <edmx:EntityTypeShape EntityType="Hi.Model.Application" Width="1.5" PointX="0.75" PointY="0.75" />
+        <edmx:EntityTypeShape EntityType="Hi.Model.Device" Width="1.5" PointX="3.375" PointY="0.75" />
+        <edmx:EntityTypeShape EntityType="Hi.Model.DeviceConnection" Width="1.5" PointX="0.75" PointY="4.75" />
+        <edmx:EntityTypeShape EntityType="Hi.Model.DeviceInvalidEvent" Width="1.5" PointX="3.25" PointY="7.75" />
+        <edmx:EntityTypeShape EntityType="Hi.Model.Message" Width="1.5" PointX="5.375" PointY="0.75" />
+        <edmx:EntityTypeShape EntityType="Hi.Model.MessageBody" Width="1.5" PointX="2.875" PointY="3.875" />
+        <edmx:EntityTypeShape EntityType="Hi.Model.MessageEntryEvent" Width="2" PointX="5" PointY="7.75" IsExpanded="true" />
+        <edmx:EntityTypeShape EntityType="Hi.Model.MessagePushEvent" Width="2" PointX="0.75" PointY="7.75" />
+        <edmx:EntityTypeShape EntityType="Hi.Model.PushMessage" Width="1.5" PointX="4.875" PointY="3.875" />
+      </edmx:Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,36 @@
+﻿<Window x:Class="Hi.NetWork.Server.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hi.NetWork.Server"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="335.837" Width="648.7">
+    <Grid Margin="0,0,-8,7">
+        <Button x:Name="btnStart" Content="Start" HorizontalAlignment="Left" Margin="230,11,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
+        <TextBox x:Name="txtIP" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="txtPort" HorizontalAlignment="Left" Height="23" Margin="141,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="51"/>
+        <ListBox x:Name="lstOnline" HorizontalAlignment="Left" Height="241" Margin="10,49,0,0" VerticalAlignment="Top" Width="182"/>
+
+        <!--每秒处理次数-->
+        <Label x:Name="lblTPS" Content="每秒处理次数：" HorizontalAlignment="Left" Margin="229,49,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lblTPSValue" Content="0" HorizontalAlignment="Left" Margin="364,49,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.056,0.727"/>
+
+        <!--平均每秒处理次数-->
+        <Label x:Name="lblAverageTPS" Content="平均每秒处理次数：" HorizontalAlignment="Left" Margin="230,75,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lblAverageTPSValue" Content="0" HorizontalAlignment="Left" Margin="364,75,0,0" VerticalAlignment="Top" RenderTransformOrigin="-4.523,0.685"/>
+
+        <!--接收总字节数-->
+        <Label x:Name="lblTotalReceivedCount" Content="接收总字节数：" HorizontalAlignment="Left" Margin="229,101,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lblTotalReceivedCountValue" Content="0" HorizontalAlignment="Left" Margin="364,101,0,0" VerticalAlignment="Top"/>
+
+        <!--每秒处理字节数-->
+        <Label x:Name="lblBPS" Content="每秒处理字节数：" HorizontalAlignment="Left" Margin="230,127,0,0" VerticalAlignment="Top" RenderTransformOrigin="7.669,3.738"/>
+        <Label x:Name="lblBPSValue" Content="0" HorizontalAlignment="Left" Margin="364,127,0,0" VerticalAlignment="Top"/>
+
+        <!--平均每秒处理字节数-->
+        <Label x:Name="lblAverageBPS" Content="平均每秒处理字节数：" HorizontalAlignment="Left" Margin="229,153,0,0" VerticalAlignment="Top" RenderTransformOrigin="7.669,3.738"/>
+        <Label x:Name="lblAverageBPSValue" Content="0" HorizontalAlignment="Left" Margin="364,153,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
