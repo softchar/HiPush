@@ -22,6 +22,12 @@ namespace Hi.NetWork.Socketing.Channels
         IByteBufAllocator Alloc { get; }
 
         /// <summary>
+        /// 当前线程是否是Eventloop线程
+        /// </summary>
+        /// <returns></returns>
+        bool InEventloop { get; }
+
+        /// <summary>
         /// 注册Eventloop
         /// </summary>
         /// <param name="loop"></param>
@@ -78,6 +84,12 @@ namespace Hi.NetWork.Socketing.Channels
         Task fireConnectAsync(EndPoint remote);
 
         void Execute(Action action);
+
+        /// <summary>
+        /// 下次执行
+        /// </summary>
+        /// <param name="action"></param>
+        void NextTimeExecute(Action action);
         
     }
 }

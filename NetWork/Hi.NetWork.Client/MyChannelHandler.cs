@@ -53,30 +53,62 @@ namespace Hi.NetWork.Client
 
         public override void OnChannelActive(IChannelHandlerContext context)
         {
-            
+            Console.WriteLine($"已连接");
 
+
+            Send(context);
+
+            //Task.Factory.StartNew(() =>
+            //{
+            //    var channel = context.Channel;
+
+            //    var bytes = CreateBytes1024();
+
+            //    for (int i = 0; i < 1000000000; i++)
+            //    {
+            //        //var bytes = System.Text.Encoding.UTF8.GetBytes(Guid.NewGuid().ToString());
+            //        //var buf = context.Alloc.GetSmallBuff();
+            //        //var buf = new FixedLengthByteBuf();
+            //        var buf = new FixedLengthByteBuf(1024);
+            //        buf.Write(bytes);
+            //        context.WriteAsync(buf);
+
+            //        //context.Channel.Send(buf);
+            //        //channel.Send(bytes);
+            //    }
+
+            //});
+
+        }
+
+        int i = 0;
+
+        private void Send(IChannelHandlerContext context)
+        {
             Task.Factory.StartNew(() =>
             {
-                var channel = context.Channel;
-
-                var bytes = CreateBytes1024();
-
-                for (int i = 0; i < 1000000000; i++)
+                while (i < 1000000000)
                 {
-                    //var bytes = System.Text.Encoding.UTF8.GetBytes(Guid.NewGuid().ToString());
-                    //var buf = context.Alloc.GetSmallBuff();
-                    //var buf = new FixedLengthByteBuf();
-                    //var buf = new FixedLengthByteBuf();
-                    var buf = new FixedLengthByteBuf(1024);
-                    buf.Write(bytes);
-                    context.WriteAsync(buf);
-
-                    //context.Channel.Send(buf);
-                    //channel.Send(bytes);
+                    //如果出站写队列不可写，那么将剩余的操作封装成Task等可写时再执行
+                    if (context.Channel.OutBoundBuffer.IsWritable)
+                    {
+                        var bytes = CreateBytes1024();
+                        var buf = (new FixedLengthByteBuf(1024)).Write(bytes);
+                        context.WriteAsync(buf);
+                    }
+                    else
+                    {
+                        context.Channel.Invoker.Execute(() => 
+                        {
+                            Send(context);
+                        });
+                        i++;
+                        break;
+                    }
+                    i++;
                 }
-
             });
-
+            
         }
 
 

@@ -40,8 +40,8 @@ namespace Hi.NetWork.Client {
             {
                 AutoReceiving = true,
                 PenddingMessageCounter = 1024,
-                ReceivingBufferSize = 1024 * 4,
-                SendingBufferSize = 1024 * 4
+                ReceivingBufferSize = 1024 * 64,
+                SendingBufferSize = 1024 * 64
             };
 
 
@@ -59,7 +59,7 @@ namespace Hi.NetWork.Client {
                     pipeline.AddLast("Dec", new LengthMessageDecoder());
                     pipeline.AddLast("MyChannelHandler", new MyChannelHandler());
                 });
-            bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse("192.168.1.101"), 51410));
+            bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse("192.168.1.100"), 46456));
 
         }
 

@@ -109,9 +109,11 @@
     <Compile Include="Socketing\ChannelPipeline\LifeCycleAttribute.cs" />
     <Compile Include="Socketing\ChannelPipeline\LifeCycleFlag.cs" />
     <Compile Include="Socketing\ChannelPipeline\TlsHandler.cs" />
+    <Compile Include="Socketing\Channels\Base\OutOfBufferException.cs" />
     <Compile Include="Socketing\Channels\ChannelConfigApplicationSettings.cs" />
     <Compile Include="Socketing\Channels\ChannelStatus.cs" />
     <Compile Include="Socketing\Channels\IChannelInvoker.cs" />
+    <Compile Include="Socketing\Channels\OutBoundBuffer.cs" />
     <Compile Include="Socketing\Handlers\ClientChannelConnector.cs" />
     <Compile Include="Socketing\Sockets\ChannelConfig.cs" />
     <Compile Include="Socketing\Sockets\TcpClientChannel.cs" />

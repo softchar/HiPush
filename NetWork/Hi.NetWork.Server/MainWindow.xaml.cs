@@ -38,7 +38,7 @@ namespace Hi.NetWork.Server
     public partial class MainWindow : Window
     {
 
-       
+
 
         int readTimes;                  //接收数据的总次数
 
@@ -50,7 +50,7 @@ namespace Hi.NetWork.Server
 
         int bps;                        //每秒处理的字节数
         int avgbps;                     //平均每秒处理的字节数
-        
+
         int timers; //秒数
 
         ServerBootstrap bootstrap;
@@ -63,8 +63,8 @@ namespace Hi.NetWork.Server
 
             ChannelConfig channelConfig = new ChannelConfig()
             {
-                ReceivingBufferSize = 1024 * 4,
-                SendingBufferSize = 1024 * 4,
+                ReceivingBufferSize = 1024 * 64,
+                SendingBufferSize = 1024 * 64,
                 PenddingMessageCounter = 1024,
                 AutoReceiving = true,
             };
@@ -89,19 +89,18 @@ namespace Hi.NetWork.Server
         private void button_Click(object sender, RoutedEventArgs e)
         {
 
-            bootstrap.BindAsync(new IPEndPoint(IPAddress.Parse("192.168.1.101"), 51410));
+            bootstrap.BindAsync(new IPEndPoint(IPAddress.Parse("192.168.1.100"), 46456));
 
             System.Timers.Timer time = new System.Timers.Timer();
             time.Elapsed += Time_Elapsed;
             time.Interval = 1000;
             time.Start();
-
         }
 
         private void Time_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            
-            this.Dispatcher.Invoke(() => 
+
+            this.Dispatcher.Invoke(() =>
             {
                 if (timers > 0)
                 {
@@ -111,9 +110,9 @@ namespace Hi.NetWork.Server
                     lblBPSValue.Content = Math.Round(secondTransDataSize / 1024 / 1024, 3) + "m/s";
                     lblAverageBPSValue.Content = Math.Round(totalTransDataSize / timers / 1024 / 1024, 3) + "m/s";
                 }
-                
+
             });
-            
+
             Interlocked.Increment(ref timers);
             Interlocked.Exchange(ref tps, 0);
             Interlocked.Exchange(ref secondTransDataSize, 0);
@@ -165,26 +164,44 @@ namespace Hi.NetWork.Server
 
                 lock (_sync)
                 {
-                    
+
                     _parent.readTimes++;
                     _parent.tps++;
                     _parent.totalTransDataSize += buf.Readables();
                     _parent.secondTransDataSize += buf.Readables();
                 }
 
-                //int size = buf.Readables();
-                //if (size == 0)
-                //{
-                //    Trace.WriteLine($"MyChannelHandler.OnChannelRead");
-                //}
-                //else
-                //{
-                //    var buf2 = context.Alloc.Buffer(buf.Readables());
-                //    buf2.Write(buf);
-                //    context.WriteAsync(buf2);
-                //}
+                int size = buf.Readables();
+                if (size == 0)
+                {
+                    Trace.WriteLine($"MyChannelHandler.OnChannelRead");
+                }
+                else
+                {
+                    var buf2 = context.Alloc.Buffer(buf.Readables());
+                    buf2.Write(buf);
+
+                    send(context, buf2);
+                }
             }
 
+            private void send(IChannelHandlerContext context, IByteBuf buf)
+            {
+                Task.Factory.StartNew(() => 
+                {
+                    if (context.Channel.OutBoundBuffer.IsWritable)
+                    {
+                        context.WriteAsync(buf);
+                    }
+                    else
+                    {
+                        context.Channel.Invoker.NextTimeExecute(() =>
+                        {
+                            send(context, buf);
+                        });
+                    }
+                });
+            }
         }
 
         class PerformanceHandler : ChannelHandler
@@ -196,12 +213,12 @@ namespace Hi.NetWork.Server
 
             public PerformanceHandler()
             {
-                
+
             }
 
             ~PerformanceHandler()
             {
-                
+
             }
 
             private void Time_Elapsed1(object sender, System.Timers.ElapsedEventArgs e)

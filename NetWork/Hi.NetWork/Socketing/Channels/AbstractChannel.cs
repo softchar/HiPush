@@ -40,6 +40,7 @@ namespace Hi.NetWork.Socketing.Channels
 
         protected IChannelInvoker invoker;           //事件执行器
         protected IByteBuf receivingByteBuf;        //接收字节缓冲区
+        protected OutBoundBuffer outBoundBuffer;
 
         /// <summary>
         /// 事件循环
@@ -95,8 +96,11 @@ namespace Hi.NetWork.Socketing.Channels
             get { return invoker.Alloc; }
         }
 
+        public OutBoundBuffer OutBoundBuffer => outBoundBuffer;
+
         public AbstractChannel()
         {
+            this.outBoundBuffer = new OutBoundBuffer();
             this.invoker = NewChannelInvoker();
         }
 
@@ -208,6 +212,12 @@ namespace Hi.NetWork.Socketing.Channels
             }
 
             /// <summary>
+            /// 当前线程是否是Eventloop线程
+            /// </summary>
+            /// <returns></returns>
+            public bool InEventloop => eventloop == null ? false : eventloop.InEventloop;
+
+            /// <summary>
             /// 执行通道已注册到Eventloop事件
             /// </summary>
             public Task fireOnChannelRegister(TaskCompletionSource promise)
@@ -302,6 +312,13 @@ namespace Hi.NetWork.Socketing.Channels
                 }
             }
 
+            public void NextTimeExecute(Action action)
+            {
+                Ensure.IsNotNull(action);
+
+                eventloop.Execute(new ActionTask(action));
+            }
+
             public Task Register(IEventloop loop)
             {
                 var promise = new TaskCompletionSource();
@@ -329,6 +346,8 @@ namespace Hi.NetWork.Socketing.Channels
                 promise.Success();
                 return promise.Task;
             }
+
+            
         }
     }
 

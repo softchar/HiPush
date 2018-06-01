@@ -65,6 +65,7 @@
     <Compile Include="ByteBuffer\PoolPageTest.cs" />
     <Compile Include="ByteBuffer\ThreadLocalByteBufPoolTest.cs" />
     <Compile Include="ByteBuffer\ThreadLocalPooledByteBufTest.cs" />
+    <Compile Include="Channel\OutBoundBufferTest.cs" />
     <Compile Include="Code\LengthMessageDecoderTest.cs" />
     <Compile Include="Eventloops\PriorityQueueTest.cs" />
     <Compile Include="Learn\Dispatcher\Dispatcher.cs" />

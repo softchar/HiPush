@@ -28,6 +28,12 @@ namespace Hi.NetWork.Socketing.ChannelPipeline
         IChannelHandlerContext Next { get; set; }
 
         IChannel Channel { get; }
+
+        /// <summary>
+        /// 是否可写
+        /// </summary>
+        bool IsWritable { get; }
+
         IChannelHandler Handler { get; }
 
         /// <summary>

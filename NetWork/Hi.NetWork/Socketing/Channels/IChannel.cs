@@ -25,6 +25,11 @@ namespace Hi.NetWork.Socketing.Channels {
         IChannelPipeline Pipeline { get; }
 
         /// <summary>
+        /// 出站缓冲区
+        /// </summary>
+        OutBoundBuffer OutBoundBuffer { get; }
+
+        /// <summary>
         /// 通道状态
         /// </summary>
         ChannelStatus ChannelStatus { get; }

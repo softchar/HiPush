@@ -176,7 +176,7 @@ namespace Hi.NetWork.Socketing.Sockets
 
                 Execute(() => { StartAccept(null); });
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return null;
             }

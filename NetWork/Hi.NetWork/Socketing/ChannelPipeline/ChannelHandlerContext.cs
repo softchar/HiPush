@@ -84,6 +84,8 @@ namespace Hi.NetWork.Socketing.ChannelPipeline
             set { incompleteHeader = value; }
         }
 
+        public bool IsWritable => channel.OutBoundBuffer.IsWritable;
+
         public ChannelHandlerContext()
         {
             implMtddict = new Dictionary<string, string>();

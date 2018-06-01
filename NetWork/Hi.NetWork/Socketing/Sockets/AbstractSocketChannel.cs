@@ -20,11 +20,13 @@ namespace Hi.NetWork.Socketing.Sockets
 {
 
     /************************************************************************/
-    /* Channel中的Socket操作
+    /*
+     * Channel中的Socket操作
      * 1：发送
      * 2：接受
      * 3：关闭连接
-     * 4：重新连接                                                                   */
+     * 4：重新连接                                                           
+     */
     /************************************************************************/
 
     /// <summary>
@@ -32,10 +34,9 @@ namespace Hi.NetWork.Socketing.Sockets
     /// </summary>
     public abstract class AbstractSocketChannel : AbstractChannel, IChannel
     {
-        protected readonly ConcurrentQueue<IByteBuf> sendingQueue1 = new ConcurrentQueue<IByteBuf>();
-        protected readonly ConcurrentQueue<WaitingMsg> sendingQueue = new ConcurrentQueue<WaitingMsg>();
+        //protected readonly ConcurrentQueue<IByteBuf> sendingQueue1 = new ConcurrentQueue<IByteBuf>();
+        protected readonly ConcurrentQueue<WaitingMessage> sendingQueue = new ConcurrentQueue<WaitingMessage>();
         protected readonly MemoryStream sendingStream = new MemoryStream();
-        /************************************************************************/
 
         private int counterSendingBytes = 0;        //已发送的字节
         private int sendingMark;                    //发送标志
@@ -125,6 +126,7 @@ namespace Hi.NetWork.Socketing.Sockets
         /// 异步写
         /// </summary>
         /// <param name="buf"></param>
+        /// /// <param name="isblocking"></param>
         /// <returns></returns>
         public override Task WriteAsync(IByteBuf buf)
         {
@@ -132,22 +134,17 @@ namespace Hi.NetWork.Socketing.Sockets
 
             var promise = new TaskCompletionSource();
 
-            while (incompleteWriteMsgCounter >= config.PenddingMessageCounter)
-            {
-                //Thread.SpinWait(3000);
-                Thread.Sleep(1);
-                TrySending();
-            }
+            outBoundBuffer.Add(new PendingMessage(buf, promise));
 
             Interlocked.Increment(ref incompleteWriteMsgCounter);
 
             //建议不要`new WaitingMsg()`而是使用对象池
-            sendingQueue.Enqueue(new WaitingMsg(promise, buf));
-            //sendingQueue1.Enqueue(buf);
+            //sendingQueue.Enqueue(new TrackingMessage(promise, buf));
 
             TrySending();
 
             return promise.Task;
+
         }
 
         public abstract override Task DoBind(EndPoint address = null);
@@ -182,7 +179,8 @@ namespace Hi.NetWork.Socketing.Sockets
             if (this.IsSending())
                 return;
 
-            Execute(TrySending0);
+            invoker.NextTimeExecute(TrySending0);
+
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -192,20 +190,18 @@ namespace Hi.NetWork.Socketing.Sockets
 
             sendingStream.SetLength(0);
 
-            WaitingMsg msg;
-
-            while (sendingQueue.TryDequeue(out msg))
+            for (int i = 0; i < 64; i++)
             {
+                var msg = outBoundBuffer.Get();
+                if (msg == null) break;
+
                 Interlocked.Decrement(ref incompleteWriteMsgCounter);
 
-                sendingStream.Write(msg.buf.GetBytes(), msg.buf.ReadIndex, msg.buf.Readables());
+                sendingStream.Write(msg.Buf.GetBytes(), msg.Buf.ReadIndex, msg.Buf.Readables());
 
-                msg.promise.Success();
+                msg.Success().Return();
 
-                msg.buf.Return();
-
-                if (sendingStream.Length >= config.SendingBufferSize)
-                    break;
+                if (sendingStream.Length >= config.SendingBufferSize) break;
             }
 
             if (sendingStream.Length > 0)
@@ -218,36 +214,36 @@ namespace Hi.NetWork.Socketing.Sockets
             }
         }
 
-        private void TrySending1()
-        {
-            if (!IsAlive) return;
-            if (this.IsSending()) return;
+        //private void TrySending1()
+        //{
+        //    if (!IsAlive) return;
+        //    if (this.IsSending()) return;
 
-            sendingStream.SetLength(0);
+        //    sendingStream.SetLength(0);
 
-            IByteBuf buf;
+        //    IByteBuf buf;
 
-            while (sendingQueue1.TryDequeue(out buf))
-            {
-                Interlocked.Decrement(ref incompleteWriteMsgCounter);
+        //    while (sendingQueue1.TryDequeue(out buf))
+        //    {
+        //        Interlocked.Decrement(ref incompleteWriteMsgCounter);
 
-                sendingStream.Write(buf.GetBytes(), buf.ReadIndex, buf.Readables());
+        //        sendingStream.Write(buf.GetBytes(), buf.ReadIndex, buf.Readables());
 
-                buf.Return();
+        //        buf.Return();
 
-                if (sendingStream.Length >= config.SendingBufferSize)
-                    break;
-            }
+        //        if (sendingStream.Length >= config.SendingBufferSize)
+        //            break;
+        //    }
 
-            if (sendingStream.Length > 0)
-            {
-                Sending();
-            }
-            else
-            {
-                ExitSending();
-            }
-        }
+        //    if (sendingStream.Length > 0)
+        //    {
+        //        Sending();
+        //    }
+        //    else
+        //    {
+        //        ExitSending();
+        //    }
+        //}
 
         /// <summary>
         /// 尝试去接收数据
@@ -263,7 +259,7 @@ namespace Hi.NetWork.Socketing.Sockets
         {
             if (!IsAlive) return;
 
-            Execute(Receiving);
+            Receiving();
         }
 
         /// <summary>
@@ -403,12 +399,12 @@ namespace Hi.NetWork.Socketing.Sockets
                 args.SetBuffer(null, 0, 0);
             }
 
-            ExitSending();
-            TrySending();
-
             //因为这里发送没有使用Bytebuf,即ByteBuf=null,否则应该放在ExitSending的前面
-            invoker.fireOnChannelSend(args.ByteBuf);
-
+            invoker.fireOnChannelSend(args.ByteBuf, () =>
+            {
+                ExitSending();
+                TrySending();
+            });
         }
 
         /// <summary>
@@ -477,19 +473,48 @@ namespace Hi.NetWork.Socketing.Sockets
         }
 
         /// <summary>
-        /// 等待发送的消息
+        /// 等待的消息
         /// </summary>
-        protected class WaitingMsg
+        protected class WaitingMessage
         {
-            public TaskCompletionSource promise;
             public IByteBuf buf;
 
-            public WaitingMsg(TaskCompletionSource promise, IByteBuf buf)
+            public WaitingMessage(IByteBuf buf)
             {
-                this.promise = promise;
                 this.buf = buf;
             }
 
+            public virtual WaitingMessage Success()
+            {
+                return this;
+            }
+
+            public virtual WaitingMessage Return()
+            {
+                buf.Return();
+                buf = null;
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// 需要跟踪的消息
+        /// </summary>
+        protected class TrackingMessage : WaitingMessage
+        {
+            public TaskCompletionSource promise;
+
+            public TrackingMessage(TaskCompletionSource promise, IByteBuf buf)
+                : base(buf)
+            {
+                this.promise = promise;
+            }
+
+            public override WaitingMessage Success()
+            {
+                this.promise.Success();
+                return this;
+            }
         }
 
     }
