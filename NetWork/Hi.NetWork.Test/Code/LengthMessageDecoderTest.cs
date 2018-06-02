@@ -277,7 +277,7 @@ namespace Hi.NetWork.Test.Code
                 }
             }
 
-            public bool IsWritable => throw new NotImplementedException();
+            public bool IsWritable => true;
 
             public void fireChannelActive()
             {

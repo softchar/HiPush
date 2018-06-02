@@ -65,7 +65,7 @@ namespace Hi.NetWork.Server
             {
                 ReceivingBufferSize = 1024 * 64,
                 SendingBufferSize = 1024 * 64,
-                PenddingMessageCounter = 1024,
+                PenddingMessageCounter = 102400,
                 AutoReceiving = true,
             };
 
@@ -89,7 +89,7 @@ namespace Hi.NetWork.Server
         private void button_Click(object sender, RoutedEventArgs e)
         {
 
-            bootstrap.BindAsync(new IPEndPoint(IPAddress.Parse("192.168.1.100"), 46456));
+            bootstrap.BindAsync(new IPEndPoint(IPAddress.Parse("192.168.1.103"), 46456));
 
             System.Timers.Timer time = new System.Timers.Timer();
             time.Elapsed += Time_Elapsed;
@@ -178,10 +178,10 @@ namespace Hi.NetWork.Server
                 }
                 else
                 {
-                    var buf2 = context.Alloc.Buffer(buf.Readables());
-                    buf2.Write(buf);
+                    //var buf2 = context.Alloc.Buffer(buf.Readables());
+                    //buf2.Write(buf);
 
-                    send(context, buf2);
+                    //send(context, buf2);
                 }
             }
 

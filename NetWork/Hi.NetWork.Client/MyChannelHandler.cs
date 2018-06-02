@@ -72,9 +72,6 @@ namespace Hi.NetWork.Client
             //        var buf = new FixedLengthByteBuf(1024);
             //        buf.Write(bytes);
             //        context.WriteAsync(buf);
-
-            //        //context.Channel.Send(buf);
-            //        //channel.Send(bytes);
             //    }
 
             //});
@@ -87,23 +84,20 @@ namespace Hi.NetWork.Client
         {
             Task.Factory.StartNew(() =>
             {
+                var bytes = CreateBytes1024();
+
                 while (i < 1000000000)
                 {
                     //如果出站写队列不可写，那么将剩余的操作封装成Task等可写时再执行
                     if (context.Channel.OutBoundBuffer.IsWritable)
                     {
-                        var bytes = CreateBytes1024();
                         var buf = (new FixedLengthByteBuf(1024)).Write(bytes);
                         context.WriteAsync(buf);
                     }
                     else
                     {
-                        context.Channel.Invoker.Execute(() => 
-                        {
-                            Send(context);
-                        });
-                        i++;
-                        break;
+                        Thread.Sleep(1);
+                        //Console.WriteLine($"进入等待");
                     }
                     i++;
                 }

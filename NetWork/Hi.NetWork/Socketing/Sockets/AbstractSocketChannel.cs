@@ -141,7 +141,7 @@ namespace Hi.NetWork.Socketing.Sockets
             //建议不要`new WaitingMsg()`而是使用对象池
             //sendingQueue.Enqueue(new TrackingMessage(promise, buf));
 
-            TrySending();
+            Flush();
 
             return promise.Task;
 
@@ -173,27 +173,28 @@ namespace Hi.NetWork.Socketing.Sockets
         /// <summary>
         /// 尝试去发送数据
         /// </summary>
-        protected void TrySending()
+        protected void Flush()
         {
             //确保eventloop的任务列表中最多只有一个发送的操作
             if (this.IsSending())
                 return;
 
-            invoker.NextTimeExecute(TrySending0);
+            invoker.Execute(TrySending);
 
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void TrySending0()
+        private void TrySending()
         {
             if (!IsAlive) return;
 
             sendingStream.SetLength(0);
 
-            for (int i = 0; i < 64; i++)
+            PendingMessage msg;
+            
+            while (outBoundBuffer.TryPeek(out msg))
             {
-                var msg = outBoundBuffer.Get();
-                if (msg == null) break;
+                outBoundBuffer.TryDequeue(out msg);
 
                 Interlocked.Decrement(ref incompleteWriteMsgCounter);
 
@@ -399,12 +400,7 @@ namespace Hi.NetWork.Socketing.Sockets
                 args.SetBuffer(null, 0, 0);
             }
 
-            //因为这里发送没有使用Bytebuf,即ByteBuf=null,否则应该放在ExitSending的前面
-            invoker.fireOnChannelSend(args.ByteBuf, () =>
-            {
-                ExitSending();
-                TrySending();
-            });
+            invoker.fireOnChannelSend(args.ByteBuf, ExitAndTrySending);
         }
 
         /// <summary>
@@ -419,13 +415,7 @@ namespace Hi.NetWork.Socketing.Sockets
                 {
                     IByteBuf buf = args.ByteBuf;
                     buf.SetWriteIndex(args.BytesTransferred);
-                    invoker.fireOnChannelRead(buf);
-
-                    Execute(() =>
-                    {
-                        ExitReceiving();
-                        TryReceiving();
-                    });
+                    invoker.fireOnChannelRead(buf, ExitAndTryReceiving);
                 }
             }
             catch (Exception ex)
@@ -433,6 +423,20 @@ namespace Hi.NetWork.Socketing.Sockets
                 Trace.WriteLine("processReceive.Unpacking:" + ex.Message);
                 Shutdown();
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ExitAndTrySending()
+        {
+            ExitSending();
+            Flush();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ExitAndTryReceiving()
+        {
+            ExitReceiving();
+            TryReceiving();
         }
 
         /// <summary>

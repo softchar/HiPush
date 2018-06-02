@@ -32,7 +32,7 @@ namespace Hi.NetWork.Test.Channel
             var buf = new FixedLengthByteBuf();
             var buffer = new OutBoundBuffer();
 
-            buffer.AddLast(new PendingMessage(buf, new TaskCompletionSource()));
+            buffer.Enqueue(new PendingMessage(buf, new TaskCompletionSource()));
 
             Assert.AreEqual(buffer.Count, 1);
 

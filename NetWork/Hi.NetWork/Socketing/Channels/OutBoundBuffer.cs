@@ -3,6 +3,7 @@ using Hi.NetWork.Buffer;
 using Hi.NetWork.Eventloops;
 using Hi.NetWork.Socketing.Channels.Base;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -18,10 +19,10 @@ namespace Hi.NetWork.Socketing.Channels
     /// <summary>
     /// 
     /// </summary>
-    public class OutBoundBuffer : HiLinkList<PendingMessage>
+    public class OutBoundBuffer : /*BlockingCollection<PendingMessage>*/ConcurrentQueue<PendingMessage>
     {
         private static int DefaultMaxCount = 16384;
-
+       
         /// <summary>
         /// 计数器的最大值
         /// </summary>
@@ -34,12 +35,10 @@ namespace Hi.NetWork.Socketing.Channels
 
         public bool IsWritable => Count < maxCount;
 
-        private object async = new object();
-
         public OutBoundBuffer()
             : this(DefaultMaxCount)
         {
-
+            
         }
 
         public OutBoundBuffer(int maxCount)
@@ -49,28 +48,19 @@ namespace Hi.NetWork.Socketing.Channels
 
         public void Add(PendingMessage msg)
         {
-            EnsureMaxCount();
+            //EnsureMaxCount();
 
-            lock (async)
-            {
-                this.AddLast(msg);
-            }
-            
+            Enqueue(msg);
         }
 
         public PendingMessage Get()
         {
-            lock (async)
+            PendingMessage msg = null;
+            if (this.TryPeek(out msg))
             {
-                var msg = this.Head;
-                if (msg == null)
-                {
-                    return null;
-                }
-
-                this.DeleteFirst();
-                return msg;
+                TryDequeue(out msg);
             }
+            return msg;
         }
 
         /// <summary>
@@ -79,7 +69,7 @@ namespace Hi.NetWork.Socketing.Channels
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void EnsureMaxCount()
         {
-            if (Count == maxCount)
+            if (Count==maxCount)
                 throw new OutOfBufferException();
         }
 
